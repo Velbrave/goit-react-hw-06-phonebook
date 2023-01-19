@@ -1,12 +1,18 @@
 import { useState } from 'react';
+import { nanoid } from 'nanoid';
+import { toast } from 'react-toastify';
 import css from './ContactForm.module.css';
 import PropTypes from 'prop-types';
+import { adContacts } from 'Redux/contactsSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
-export const ContactForm = ({ onSubmit }) => {
+export const ContactForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     number: '',
   });
+  const contacts = useSelector(state => state.contacts);
+  const dispatch = useDispatch();
 
   const handleChange = event => {
     setFormData(prevState => ({
@@ -17,7 +23,11 @@ export const ContactForm = ({ onSubmit }) => {
 
   const handleSubmit = event => {
     event.preventDefault();
-    onSubmit(formData);
+    const userId = nanoid();
+    const formData = { id: userId, name, number };
+    contacts.contacts.find(contact => contact.name === name)
+      ? toast.error('This contact already exists')
+      : dispatch(adContacts(formData));
     setFormData({ name: '', number: '' });
   };
 
